@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#e94560" />
+    <meta name="description" content="Real-time weather for any city" />
+    <link rel="manifest" href="manifest.json" />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app-container">
+
+      <h1 class="app-title">Weather App</h1>
+
+      <!-- using a form so Enter key triggers submit automatically -->
+      <form class="search-form" id="search-form">
+        <input
+          type="text"
+          class="search-input"
+          id="city-input"
+          placeholder="Enter city name…"
+          autocomplete="off"
+          aria-label="City name"
+        />
+        <button type="submit" class="search-btn">Search</button>
+      </form>
+
+      <!-- geolocation shortcut -->
+      <button class="geo-btn" id="geo-btn" type="button" aria-label="Use my location">
+        <svg class="geo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+          <circle cx="12" cy="12" r="9" opacity=".3"/>
+        </svg>
+        Use my location
+      </button>
+
+      <!-- hidden by default, shown on error -->
+      <p class="error-message" id="error-message" hidden></p>
+
+      <!-- recent searches — hidden when list is empty -->
+      <div class="recent-searches" id="recent-searches" hidden aria-label="Recent searches"></div>
+
+      <!-- aria-live tells screen readers to announce when this region updates -->
+      <div
+        class="weather-card"
+        id="weather-card"
+        hidden
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <h2 class="city-name" id="city-name"></h2>
+
+        <!-- emoji filled in by JS based on WMO code -->
+        <span class="weather-icon" id="weather-icon" aria-hidden="true"></span>
+
+        <div class="temperature-row">
+          <p class="temperature" id="temperature"></p>
+          <!-- type="button" stops this from submitting the form -->
+          <button class="unit-toggle" id="unit-toggle" type="button">°F</button>
+        </div>
+
+        <p class="description" id="description"></p>
+
+        <div class="details-row">
+          <div class="detail">
+            <span class="detail-label">Humidity</span>
+            <span class="detail-value" id="humidity"></span>
+          </div>
+          <div class="detail">
+            <span class="detail-label">Wind</span>
+            <span class="detail-value" id="wind-speed"></span>
+          </div>
+          <div class="detail">
+            <span class="detail-label">Feels like</span>
+            <span class="detail-value" id="feels-like"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- forecast cards injected here by JS -->
+      <div class="forecast-strip" id="forecast-strip" hidden></div>
+
+      <div class="spinner" id="spinner" hidden></div>
+
+    </div>
+
+    <!-- type="module" enables import/export and defers execution automatically -->
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
