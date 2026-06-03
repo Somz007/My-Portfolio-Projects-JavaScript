@@ -283,8 +283,10 @@ async function loadRates() {
     rateMap = await fetchRates();
     applyRate();
   } catch {
-    // offline or API down — fall back to ZAR only, disable other options
-    currencySelect.value = 'ZAR';
+    // offline or API down — lock to ZAR and signal it visually
+    currencySelect.value    = 'ZAR';
+    currencySelect.disabled = true;
+    currencySelect.title    = 'Live rates unavailable — showing ZAR only';
     setCurrency('ZAR');
     setRate(1);
     refresh();

@@ -23,6 +23,15 @@ export function renderEmpty(msg = 'No recipes found.') {
     </div>`;
 }
 
+export function renderError(msg) {
+  gridEl.innerHTML = `
+    <div class="state-box">
+      <span class="state-icon">⚠️</span>
+      <p>${msg}</p>
+      <button type="button" id="retry-btn" class="retry-btn">Try again</button>
+    </div>`;
+}
+
 // ── Categories ─────────────────────────────────────────────────
 
 export function renderCategories(categories, activeCategory, onSelect) {
@@ -60,7 +69,8 @@ export function renderCards(meals, favIds) {
     article.dataset.id  = meal.idMeal;
     article.innerHTML   = `
       <div class="card-img-wrap">
-        <img src="${meal.strMealThumb}/preview" alt="${esc(meal.strMeal)}" loading="lazy">
+        <img src="${meal.strMealThumb}/preview" alt="${esc(meal.strMeal)}" loading="lazy"
+             onerror="this.onerror=null;this.classList.add('img-error')">
         <button type="button" class="fav-btn${isFav ? ' active' : ''}"
           aria-label="${isFav ? 'Remove from' : 'Add to'} favourites">
           ${isFav ? '♥' : '♡'}
@@ -116,7 +126,8 @@ export function renderModal(meal, isFav) {
   const meta = [meal.strCategory, meal.strArea].filter(Boolean).join(' · ');
 
   return `
-    <img class="modal-img" src="${meal.strMealThumb}" alt="${esc(meal.strMeal)}">
+    <img class="modal-img" src="${meal.strMealThumb}" alt="${esc(meal.strMeal)}"
+         onerror="this.onerror=null;this.classList.add('img-error')">
     <div class="modal-header">
       <div class="modal-title-wrap">
         <h2>${esc(meal.strMeal)}</h2>

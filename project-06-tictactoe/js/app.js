@@ -1,5 +1,6 @@
-import { createBoard, getWinner, getWinLine, isDraw, getBestMove } from './game.js';
-import { renderBoard, renderStatus, renderScores } from './render.js';
+import { createBoard, getWinner, getWinLine, isDraw, getBestMove, getRandomMove } from './game.js';
+import { renderBoard, renderStatus, renderScores, popScore } from './render.js';
+import { playPlace, playWin, playDraw, playLose } from './sound.js';
 
 const STORAGE_SCORES = 'ttt-scores';
 const STORAGE_THEME  = 'ttt-theme';
@@ -8,14 +9,15 @@ const AI_DELAY_MS    = 400; // feels more natural than instant
 // ── State ──────────────────────────────────────────────────────
 
 const state = {
-  board:    createBoard(),
-  mode:     'ai',    // 'ai' | 'human'
-  humanSym: 'X',
-  aiSym:    'O',
-  current:  'X',     // X always goes first
-  gameOver: false,
-  thinking: false,   // true while AI's setTimeout is in flight
-  scores:   loadScores(),
+  board:      createBoard(),
+  mode:       'ai',    // 'ai' | 'human'
+  difficulty: 'hard',  // 'easy' | 'medium' | 'hard'
+  humanSym:   'X',
+  aiSym:      'O',
+  current:    'X',     // X always goes first
+  gameOver:   false,
+  thinking:   false,   // true while AI's setTimeout is in flight
+  scores:     loadScores(),
 };
 
 function loadScores() {
@@ -62,6 +64,7 @@ function handleClick(i) {
 
 function placeMove(i) {
   state.board[i] = state.current;
+  playPlace();
 
   const winner  = getWinner(state.board);
   const winLine = getWinLine(state.board);
@@ -73,10 +76,15 @@ function placeMove(i) {
     saveScores();
     renderBoard(state.board, winLine, handleClick, true);
     renderScores(state.scores, state.mode, state.humanSym);
+    popScore(document.getElementById(`score-${winner.toLowerCase()}`));
+
     if (state.mode === 'ai') {
-      renderStatus(winner === state.humanSym ? 'You win!' : 'AI wins!', 'win');
+      const humanWon = winner === state.humanSym;
+      renderStatus(humanWon ? 'You win! 🎉' : 'AI wins!', 'win');
+      humanWon ? playWin() : playLose();
     } else {
-      renderStatus(`${winner} wins!`, 'win');
+      renderStatus(`${winner} wins! 🎉`, 'win');
+      playWin();
     }
     return;
   }
@@ -87,7 +95,9 @@ function placeMove(i) {
     saveScores();
     renderBoard(state.board, null, handleClick, true);
     renderScores(state.scores, state.mode, state.humanSym);
+    popScore(document.getElementById('score-draws'));
     renderStatus("It's a draw!", 'draw');
+    playDraw();
     return;
   }
 
@@ -108,7 +118,17 @@ function placeMove(i) {
 
 function aiMove() {
   state.thinking = false;
-  const move = getBestMove(state.board, state.aiSym, state.humanSym);
+  let move;
+  if (state.difficulty === 'easy') {
+    move = getRandomMove(state.board);
+  } else if (state.difficulty === 'medium') {
+    // 50/50 between random and optimal — beatable but not trivial
+    move = Math.random() < 0.5
+      ? getRandomMove(state.board)
+      : getBestMove(state.board, state.aiSym, state.humanSym);
+  } else {
+    move = getBestMove(state.board, state.aiSym, state.humanSym);
+  }
   if (move !== -1) placeMove(move);
 }
 
@@ -121,7 +141,9 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
     state.mode = btn.dataset.mode;
 
     const sidePicker = document.getElementById('side-picker');
+    const diffPicker = document.getElementById('diff-picker');
     sidePicker.hidden = state.mode === 'human';
+    diffPicker.hidden = state.mode === 'human';
 
     // in human mode the AI/human distinction doesn't apply
     if (state.mode === 'human') {
@@ -139,6 +161,15 @@ document.querySelectorAll('.side-btn').forEach(btn => {
     btn.classList.add('active');
     state.humanSym = btn.dataset.side;
     state.aiSym    = btn.dataset.side === 'X' ? 'O' : 'X';
+    startGame();
+  });
+});
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.difficulty = btn.dataset.diff;
     startGame();
   });
 });

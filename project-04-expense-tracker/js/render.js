@@ -66,14 +66,16 @@ export function renderOverview(container, expenses) {
       <div class="chart-card">
         <h3 class="chart-title">By Category</h3>
         <div class="donut-wrap">
-          <canvas class="donut-canvas" id="donut-canvas"></canvas>
+          <canvas class="donut-canvas" id="donut-canvas"
+                  role="img" aria-label="Category breakdown donut chart"></canvas>
         </div>
         <div class="donut-legend">${legendHTML || '<p class="empty-chart">No expenses this month</p>'}</div>
       </div>
 
       <div class="chart-card bar-card">
         <h3 class="chart-title">Monthly Trend</h3>
-        <canvas class="bar-canvas" id="bar-canvas"></canvas>
+        <canvas class="bar-canvas" id="bar-canvas"
+                role="img" aria-label="Monthly spending trend bar chart"></canvas>
       </div>
     </div>`;
 }

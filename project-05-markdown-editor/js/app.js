@@ -20,6 +20,9 @@ const newBtn      = document.getElementById('new-doc-btn');
 const exportMdBtn = document.getElementById('export-md-btn');
 const exportHtmlBtn = document.getElementById('export-html-btn');
 const themeBtn    = document.getElementById('theme-btn');
+const helpBtn     = document.getElementById('help-btn');
+const helpOverlay = document.getElementById('help-overlay');
+const helpClose   = document.getElementById('help-close');
 const sidebarBtn  = document.getElementById('sidebar-toggle');
 const sidebar     = document.getElementById('sidebar');
 const divider     = document.getElementById('divider');
@@ -92,8 +95,18 @@ toolbar.addEventListener('click', e => {
   if (btn) applyFormat(textarea, btn.dataset.action);
 });
 
+// ── Help panel ─────────────────────────────────────────────────
+helpBtn.addEventListener('click', () => { helpOverlay.hidden = false; helpClose.focus(); });
+helpClose.addEventListener('click', () => { helpOverlay.hidden = true; helpBtn.focus(); });
+helpOverlay.addEventListener('click', e => { if (e.target === helpOverlay) helpOverlay.hidden = true; });
+
 // ── Keyboard shortcuts ─────────────────────────────────────────
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !helpOverlay.hidden) {
+    helpOverlay.hidden = true;
+    helpBtn.focus();
+    return;
+  }
   if (!(e.ctrlKey || e.metaKey)) return;
   const key = e.key.toLowerCase();
 

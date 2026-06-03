@@ -24,6 +24,14 @@
 /* ensure the HTML hidden attribute always wins over CSS display values */
 [hidden] { display: none !important; }
 
+/* remove mouse-click ring but keep a themed keyboard-nav ring */
+*:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 body {
   min-height: 100svh;
   background: var(--bg);

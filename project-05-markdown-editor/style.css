@@ -33,6 +33,13 @@
 *::before,
 *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+*:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 [hidden] { display: none !important; }
 
 html, body { height: 100%; }
@@ -398,4 +405,66 @@ body {
 @media (min-width: 761px) {
   /* the toggle is only needed on small screens */
   #sidebar-toggle { display: none; }
+}
+
+/* ── Help overlay ─────────────────────────────────────────────── */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.help-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: min(420px, 90vw);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.help-header h2 { font-size: 1rem; font-weight: 700; }
+
+.shortcut-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.shortcut-table td {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.shortcut-table td:first-child { white-space: nowrap; }
+
+.shortcut-table tr + tr td { border-top: 1px solid var(--border); }
+
+kbd {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+  font-family: "Cascadia Code", monospace;
+}
+
+.help-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
 }

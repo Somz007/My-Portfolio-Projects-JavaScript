@@ -34,6 +34,13 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+*:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
@@ -100,6 +107,7 @@ h1 {
 }
 
 .mode-picker,
+.diff-picker,
 .side-picker {
   display: flex;
   align-items: center;
@@ -117,6 +125,7 @@ h1 {
 }
 
 .mode-btn,
+.diff-btn,
 .side-btn {
   background: none;
   border: none;
@@ -130,6 +139,7 @@ h1 {
 }
 
 .mode-btn.active,
+.diff-btn.active,
 .side-btn.active {
   background: var(--surface2);
   color: var(--text);
@@ -156,6 +166,7 @@ h1 {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   width: 100%;
+  position: relative; /* needed to position the SVG win-line overlay */
 }
 
 .cell {
@@ -194,6 +205,31 @@ h1 {
   100% { transform: scale(1);                  }
 }
 
+/* ── Win line SVG ─────────────────────────────────────────────── */
+
+.win-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.win-line line {
+  stroke: gold;
+  stroke-width: 5;
+  stroke-linecap: round;
+  /* animate by collapsing dashoffset from full length to 0 */
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  animation: draw-win-line 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.05s;
+}
+
+@keyframes draw-win-line {
+  to { stroke-dashoffset: 0; }
+}
+
 /* ── Scores ───────────────────────────────────────────────────── */
 
 .scores {
@@ -226,6 +262,14 @@ h1 {
   font-weight: 800;
   line-height: 1;
 }
+
+@keyframes score-pop {
+  0%   { transform: scale(1);    color: inherit; }
+  40%  { transform: scale(1.55); color: gold;    }
+  100% { transform: scale(1);    color: inherit; }
+}
+
+.score-num.pop { animation: score-pop 0.45s ease; }
 
 /* ── Buttons ──────────────────────────────────────────────────── */
 

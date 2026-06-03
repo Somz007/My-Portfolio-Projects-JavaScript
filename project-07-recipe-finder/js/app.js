@@ -1,7 +1,7 @@
 import { searchByName, getCategories, filterByCategory, lookupById } from './api.js';
 import { getFavourites, isFavourite, addFavourite, removeFavourite } from './storage.js';
 import {
-  renderCategories, renderCards, renderLoading, renderEmpty,
+  renderCategories, renderCards, renderLoading, renderEmpty, renderError,
   renderModal, renderFavCount, updateFavBtn,
 } from './render.js';
 
@@ -17,6 +17,7 @@ const state = {
   tab:            'results',
   meals:          [],        // card-level objects for the current results view
   mealMap:        new Map(), // id → card-level (or full) meal object
+  lastLoad:       null,      // { type: 'category'|'search', value: string } for retry
 };
 
 // ── Init ───────────────────────────────────────────────────────
@@ -34,12 +35,13 @@ async function init() {
     ]);
 
     state.categories = cats;
+    state.lastLoad   = { type: 'category', value: DEFAULT_CATEGORY };
     meals.forEach(m => { m.strCategory = DEFAULT_CATEGORY; });
 
     renderCategories(cats, DEFAULT_CATEGORY, handleCategorySelect);
     setMeals(meals);
   } catch {
-    renderEmpty('Could not load recipes — check your connection.');
+    renderError('Could not load recipes — check your connection.');
   }
 }
 
@@ -54,6 +56,7 @@ function setMeals(meals) {
 
 async function loadCategory(category) {
   state.activeCategory = category;
+  state.lastLoad       = { type: 'category', value: category };
   state.query          = '';
   searchInput.value    = '';
   renderCategories(state.categories, category, handleCategorySelect);
@@ -64,21 +67,23 @@ async function loadCategory(category) {
     meals.forEach(m => { m.strCategory = category; });
     setMeals(meals);
   } catch {
-    renderEmpty('Could not load recipes.');
+    renderError('Could not load recipes — check your connection.');
   }
 }
 
 async function loadSearch(query) {
   state.query          = query;
+  state.lastLoad       = { type: 'search', value: query };
   state.activeCategory = null;
   renderCategories(state.categories, null, handleCategorySelect);
   renderLoading();
 
   try {
     const meals = await searchByName(query);
+    if (!meals.length) { renderEmpty(`No recipes found for "${query}".`); return; }
     setMeals(meals);
   } catch {
-    renderEmpty('Search failed — check your connection.');
+    renderError('Search failed — check your connection.');
   }
 }
 
@@ -123,8 +128,15 @@ searchInput.addEventListener('input', e => {
   searchTimer = setTimeout(() => loadSearch(q), 400);
 });
 
-// grid — card opens modal, fav button toggles fav
+// grid — card opens modal, fav button toggles fav, retry reloads last call
 document.getElementById('grid').addEventListener('click', async e => {
+  if (e.target.id === 'retry-btn') {
+    if (!state.lastLoad) return;
+    if (state.lastLoad.type === 'category') await loadCategory(state.lastLoad.value);
+    else await loadSearch(state.lastLoad.value);
+    return;
+  }
+
   const favBtn = e.target.closest('.fav-btn');
   const card   = e.target.closest('.card');
 
