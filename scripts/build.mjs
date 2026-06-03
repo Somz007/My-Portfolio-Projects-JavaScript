@@ -19,7 +19,7 @@ const SKIP = new Set([
 
 // project metadata for the landing page
 const META = {
-  'project-01-weather-app':   { num: '01', title: 'Weather App',      desc: 'Real-time weather for any city using the OpenWeather API, async/await, and a glassmorphism card.',          note: '⚠️ Requires a free API key — see README' },
+  'project-01-weather-app':   { num: '01', title: 'Weather App',      desc: 'Real-time weather for any city — Open-Meteo API, no key required, geolocation, 7-day forecast.' },
   'project-02-todo-list':     { num: '02', title: 'To-Do List',       desc: 'Keyboard-friendly task manager with filtering, drag-to-reorder, inline editing, and localStorage.' },
   'project-03-quiz-app':      { num: '03', title: 'Quiz App',         desc: 'Trivia quiz with three difficulty levels, lifelines, sound effects, and per-category high scores.' },
   'project-04-expense-tracker':{ num: '04', title: 'Expense Tracker', desc: 'Finance dashboard with hand-drawn Canvas charts, budget alerts, CSV export, and live currency rates.' },

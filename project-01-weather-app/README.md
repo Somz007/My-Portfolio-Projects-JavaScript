@@ -1,21 +1,24 @@
 # Project 01 — Weather App
 
-A clean, responsive weather app that fetches real-time data from the [OpenWeather API](https://openweathermap.org/api) and displays current conditions for any city in the world.
+A clean, responsive weather app that fetches real-time conditions for any city using the [Open-Meteo API](https://open-meteo.com/) — completely free, no API key required.
 
 Built as Project 1 of my JavaScript portfolio while learning frontend web development.
 
-🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-01-weather-app/) — ⚠️ requires a free [OpenWeather API key](https://openweathermap.org/api) (see setup below)**
-
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-01-weather-app/)**
 
 ---
 
 ## Features
 
 - Search any city worldwide
-- Displays temperature (°C), weather description, humidity, wind speed, and "feels like"
-- Animated weather icons from OpenWeather's icon CDN
-- Loading spinner during API requests
-- Friendly error messages for invalid cities or API issues
+- Displays temperature (°C / °F toggle), weather description, humidity, wind speed, and "feels like"
+- Animated weather emoji icons mapped from WMO weather codes
+- 7-day forecast strip
+- Geolocation — "Use my location" fetches weather for your current position
+- Recent searches saved in localStorage
+- Dynamic background that changes with weather conditions (sunny, cloudy, rainy, etc.)
+- 10-minute in-memory cache — repeated searches skip the network
+- Service worker for offline support
 - Fully responsive — works on mobile and desktop
 
 ---
@@ -24,38 +27,27 @@ Built as Project 1 of my JavaScript portfolio while learning frontend web develo
 
 | Technology | Purpose |
 |---|---|
-| HTML5 | Page structure & semantic markup |
-| CSS3 | Styling, Flexbox layout, glassmorphism card, animations |
-| Vanilla JavaScript (ES2017+) | DOM manipulation, Fetch API, async/await |
-| OpenWeather API | Real-time weather data |
+| HTML5 | Semantic markup, PWA manifest |
+| CSS3 | Dynamic backgrounds, glassmorphism card, animations |
+| Vanilla JavaScript (ES Modules) | Fetch API, async/await, caching, service worker |
+| [Open-Meteo](https://open-meteo.com/) | Weather data — free, no key, no sign-up |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | City name → coordinates |
+| [Nominatim (OpenStreetMap)](https://nominatim.org/) | Reverse geocoding for geolocation |
 
 ---
 
 ## Getting Started
 
-### 1. Get a free API key
+No API key needed. Open `index.html` directly in your browser — or use the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) VS Code extension for auto-reload.
 
-1. Sign up at [openweathermap.org](https://openweathermap.org/api)
-2. Go to **My Account → API keys**
-3. Copy your default key (or generate a new one)
+> **Geolocation** requires a secure context (HTTPS or `localhost`). It will not work when the file is opened from the filesystem via `file://`. Use Live Server or the live demo link above.
 
-> Free tier includes up to 1,000 calls/day — more than enough for personal use.
+### Run tests
 
-### 2. Configure your key
-
-Create a file called `config.js` in the project folder:
-
-```js
-const CONFIG = {
-  API_KEY: "paste_your_key_here",
-};
+```bash
+npm install
+npm test
 ```
-
-> ⚠️ `config.js` is listed in `.gitignore` and will **not** be committed to Git. Never paste your API key directly into `script.js` or any other tracked file.
-
-### 3. Open the app
-
-Open `index.html` in your browser directly, or use the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) VS Code extension for auto-reload on save.
 
 ---
 
@@ -63,34 +55,48 @@ Open `index.html` in your browser directly, or use the [Live Server](https://mar
 
 ```
 project-01-weather-app/
-├── index.html      # Page structure
-├── style.css       # All styling
-├── script.js       # All JavaScript logic
-├── config.js       # ← YOU CREATE THIS (API key, gitignored)
-├── .gitignore      # Excludes config.js from version control
-└── README.md       # This file
+├── js/
+│   ├── app.js        ← events, state, orchestration
+│   ├── api.js        ← Open-Meteo + Nominatim fetch calls
+│   ├── constants.js  ← API URLs, WMO code map, cache TTL
+│   ├── cache.js      ← in-memory response cache
+│   ├── storage.js    ← recent searches (localStorage)
+│   └── render.js     ← DOM updates: weather card, forecast, errors
+├── icons/            ← PWA icons
+├── tests/
+├── index.html
+├── style.css
+├── sw.js             ← service worker (offline support)
+├── manifest.json     ← PWA manifest
+├── package.json
+├── vitest.config.js
+└── README.md
 ```
+
+---
+
+## How It Works
+
+1. **City search** — the typed city name is sent to the Open-Meteo geocoding API, which returns latitude and longitude. Those coordinates are then passed to the weather API.
+2. **Geolocation** — the browser's `navigator.geolocation` returns raw coordinates, which go through Nominatim for a human-readable city name and then directly to Open-Meteo for weather.
+3. **Caching** — both paths cache the response in memory for 10 minutes so repeated requests for the same city don't hit the network.
+4. **WMO codes** — Open-Meteo returns a numeric WMO weather code (e.g. `61` = slight rain). The app maps these to emoji icons and background themes via a lookup table in `constants.js`.
 
 ---
 
 ## What I Learned
 
-- How to use the **Fetch API** with `async/await` for cleaner asynchronous code
-- How to handle HTTP errors manually (fetch doesn't throw on 4xx/5xx)
-- **Separation of concerns** — keeping HTML, CSS, and JS in separate files
-- How to secure API keys in a client-side app (`.gitignore` + separate config file)
-- CSS **Flexbox** for responsive layouts
-- CSS **glassmorphism** effect using `backdrop-filter`
-- DOM manipulation: showing/hiding elements with the `hidden` attribute
-
----
-
-## Screenshots
-
-_Add a screenshot here once the app is running._
+- How to chain multiple API calls (geocoding → weather) using `async/await`
+- How to handle HTTP errors manually (`fetch` doesn't throw on 4xx/5xx)
+- **ES Modules** — splitting logic across files with `import`/`export`
+- **In-memory caching** — avoiding redundant network requests with a `Map` keyed by city
+- **WMO weather codes** — a standardised numeric system used by meteorological services worldwide
+- How to register a **service worker** for offline support and asset caching
+- CSS dynamic theming — swapping a background class based on weather conditions
+- **Geolocation API** and how to handle its various error states (`PERMISSION_DENIED`, `POSITION_UNAVAILABLE`, `TIMEOUT`)
 
 ---
 
 ## Author
 
-**Semeshan** — [GitHub](https://github.com/Semeshan)
+**Semeshan** — [GitHub](https://github.com/Somz007)
