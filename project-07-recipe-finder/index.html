@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder — Project 07</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header>
+      <h1>Recipe Finder</h1>
+      <button type="button" id="theme-toggle" aria-label="Toggle theme">☀︎</button>
+    </header>
+
+    <div class="search-row">
+      <input type="search" id="search-input"
+        placeholder="Search recipes by name…"
+        autocomplete="off" spellcheck="false"
+        aria-label="Search recipes">
+    </div>
+
+    <nav class="categories" id="categories" aria-label="Browse by category"></nav>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="results"
+        role="tab" aria-selected="true">Results</button>
+      <button type="button" class="tab" data-tab="favourites"
+        role="tab" aria-selected="false">
+        Favourites <span class="badge" id="fav-count" hidden>0</span>
+      </button>
+    </div>
+
+    <main id="grid" class="grid" aria-live="polite" aria-label="Recipe results"></main>
+
+  </div>
+
+  <!-- Detail modal -->
+  <div class="modal-overlay" id="modal-overlay" hidden
+    role="dialog" aria-modal="true" aria-label="Recipe detail">
+    <div class="modal">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <div class="modal-scroll">
+        <div id="modal-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
