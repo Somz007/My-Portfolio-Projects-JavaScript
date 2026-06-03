@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Live Markdown editor with split-pane preview, document management, and .md / .html export." />
+    <title>Markdown Editor</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app">
+
+      <!-- ── Top bar ─────────────────────────────────────────── -->
+      <header class="app-header">
+        <button class="icon-btn" id="sidebar-toggle" aria-label="Toggle documents">☰</button>
+        <span class="brand">📝 Markdown</span>
+
+        <!-- editable document title -->
+        <input type="text" class="doc-title" id="doc-title"
+               placeholder="Untitled" aria-label="Document title" maxlength="80" />
+
+        <div class="header-actions">
+          <button class="text-btn" id="export-md-btn"   type="button">.md</button>
+          <button class="text-btn" id="export-html-btn" type="button">.html</button>
+          <button class="icon-btn" id="theme-btn"  type="button" aria-label="Toggle theme">☀️</button>
+          <button class="icon-btn" id="help-btn"   type="button" aria-label="Keyboard shortcuts">?</button>
+        </div>
+      </header>
+
+      <!-- ── Formatting toolbar ──────────────────────────────── -->
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="Formatting">
+        <button class="tool-btn" data-action="h1"     title="Heading 1"      type="button">H1</button>
+        <button class="tool-btn" data-action="h2"     title="Heading 2"      type="button">H2</button>
+        <button class="tool-btn" data-action="h3"     title="Heading 3"      type="button">H3</button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn" data-action="bold"   title="Bold (Ctrl+B)"  type="button"><b>B</b></button>
+        <button class="tool-btn" data-action="italic" title="Italic (Ctrl+I)" type="button"><i>I</i></button>
+        <button class="tool-btn" data-action="strike" title="Strikethrough"  type="button"><s>S</s></button>
+        <button class="tool-btn" data-action="code"   title="Inline code"    type="button">&lt;/&gt;</button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn" data-action="quote"  title="Quote"          type="button">❝</button>
+        <button class="tool-btn" data-action="ul"     title="Bullet list"    type="button">•</button>
+        <button class="tool-btn" data-action="ol"     title="Numbered list"  type="button">1.</button>
+        <span class="tool-sep"></span>
+        <button class="tool-btn" data-action="link"   title="Link (Ctrl+K)"  type="button">🔗</button>
+        <button class="tool-btn" data-action="image"  title="Image"          type="button">🖼</button>
+      </div>
+
+      <!-- ── Workspace: sidebar | editor | preview ───────────── -->
+      <div class="workspace" id="workspace">
+
+        <!-- document list -->
+        <aside class="sidebar" id="sidebar">
+          <button class="new-doc-btn" id="new-doc-btn" type="button">+ New Document</button>
+          <div class="doc-list" id="doc-list"></div>
+        </aside>
+
+        <!-- editor -->
+        <section class="editor-pane" id="editor-pane">
+          <textarea class="editor" id="editor" spellcheck="true"
+                    placeholder="Start writing markdown…"></textarea>
+        </section>
+
+        <!-- draggable divider -->
+        <div class="divider" id="divider" role="separator" aria-label="Resize panes"></div>
+
+        <!-- live preview -->
+        <section class="preview-pane" id="preview-pane">
+          <article class="preview" id="preview"></article>
+        </section>
+
+      </div>
+
+      <!-- ── Status bar ──────────────────────────────────────── -->
+      <footer class="statusbar">
+        <span class="stat" id="stat-words">0 words</span>
+        <span class="stat" id="stat-chars">0 chars</span>
+        <span class="stat" id="stat-time">—</span>
+        <span class="saved-indicator" id="saved-indicator">✓ Saved</span>
+      </footer>
+
+    </div>
+
+    <!-- Keyboard shortcuts help panel -->
+    <div class="help-overlay" id="help-overlay" hidden
+         role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="help-box">
+        <div class="help-header">
+          <h2 id="help-title">Keyboard Shortcuts</h2>
+          <button class="icon-btn" id="help-close" type="button" aria-label="Close">✕</button>
+        </div>
+        <table class="shortcut-table">
+          <tbody>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Bold</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>Italic</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Link</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save now</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>Indent (in editor)</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close this panel</td></tr>
+          </tbody>
+        </table>
+        <p class="help-note">Drag the centre divider to resize panes — ratio is saved.</p>
+      </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

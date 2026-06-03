@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app">
+
+      <header class="app-header">
+        <h1 class="app-title">My Tasks</h1>
+        <span class="task-count" id="task-count"></span>
+      </header>
+
+      <form class="add-form" id="add-form">
+        <div class="add-main">
+          <input
+            type="text"
+            class="add-input"
+            id="add-input"
+            placeholder="What needs to be done?"
+            autocomplete="off"
+            aria-label="New task"
+            maxlength="200"
+          />
+          <button type="submit" class="add-btn">Add</button>
+        </div>
+
+        <!-- optional due date row — hidden by default -->
+        <div class="add-date-row" id="add-date-row" hidden>
+          <label for="due-date-input" class="date-label">Due date</label>
+          <input type="date" class="date-input" id="due-date-input" />
+          <button type="button" class="date-clear" id="date-clear" aria-label="Clear date">×</button>
+        </div>
+
+        <button type="button" class="add-date-toggle" id="add-date-toggle">+ Add due date</button>
+      </form>
+
+      <!-- keyboard shortcut hint -->
+      <p class="shortcut-hint">Press <kbd>n</kbd> to quickly add a task</p>
+
+      <!-- filter bar + footer — hidden when there are no tasks -->
+      <div class="controls" id="controls" hidden>
+
+        <!-- toggle-all row -->
+        <div class="toggle-all-row">
+          <label class="toggle-all-label" title="Toggle all tasks">
+            <!--
+              opacity:0 instead of display:none keeps the native checkbox in the
+              accessibility tree so keyboard users can still reach it.
+            -->
+            <input type="checkbox" class="toggle-all-check" id="toggle-all" />
+            <span class="toggle-all-custom"></span>
+            <span class="toggle-all-text">Mark all complete</span>
+          </label>
+        </div>
+
+        <div class="filter-bar" id="filter-bar" role="group" aria-label="Filter tasks">
+          <button class="filter-btn active" data-filter="all"       type="button">All</button>
+          <button class="filter-btn"        data-filter="active"    type="button">Active</button>
+          <button class="filter-btn"        data-filter="completed" type="button">Completed</button>
+        </div>
+
+        <footer class="app-footer">
+          <span class="remaining" id="remaining"></span>
+          <button class="clear-btn" id="clear-btn" type="button">Clear completed</button>
+        </footer>
+
+      </div>
+
+      <!-- aria-live announces changes to screen readers -->
+      <ul class="task-list" id="task-list" aria-live="polite" role="list"></ul>
+
+      <!-- empty state — shown when filter returns no results -->
+      <div class="empty-state" id="empty-state" hidden>
+        <!-- clipboard SVG icon — hidden when it's a filter-level empty, not a true empty -->
+        <svg id="empty-icon" class="empty-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="12" y="10" width="40" height="48" rx="4" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M22 10V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="20" y1="26" x2="44" y2="26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="20" y1="34" x2="38" y2="34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="20" y1="42" x2="32" y2="42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p id="empty-text" class="empty-text"></p>
+      </div>
+
+    </div>
+
+    <!-- undo-delete toast — fixed to bottom of screen -->
+    <div class="toast" id="toast" hidden aria-live="assertive">
+      <span id="toast-msg"></span>
+      <button type="button" id="toast-undo" class="toast-undo">Undo</button>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

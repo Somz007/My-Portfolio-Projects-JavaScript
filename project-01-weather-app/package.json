@@ -1,0 +1,10 @@
+{
+  "name": "project-01-weather-app",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}

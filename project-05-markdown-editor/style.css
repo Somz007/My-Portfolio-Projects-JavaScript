@@ -1,0 +1,470 @@
+/* ================================================================
+   style.css — Markdown Editor
+   Two themes via [data-theme] on <html>.
+   ================================================================ */
+
+:root[data-theme="dark"] {
+  --bg:          #0d1117;
+  --surface:     #161b22;
+  --surface-2:   #1c2129;
+  --border:      rgba(255, 255, 255, 0.09);
+  --text:        #e6edf3;
+  --text-dim:    rgba(255, 255, 255, 0.55);
+  --text-muted:  rgba(255, 255, 255, 0.3);
+  --accent:      #58a6ff;
+  --code-bg:     #1c2129;
+  --quote-bar:   #30363d;
+}
+
+:root[data-theme="light"] {
+  --bg:          #ffffff;
+  --surface:     #f6f8fa;
+  --surface-2:   #eef1f4;
+  --border:      rgba(0, 0, 0, 0.1);
+  --text:        #1f2328;
+  --text-dim:    rgba(0, 0, 0, 0.6);
+  --text-muted:  rgba(0, 0, 0, 0.4);
+  --accent:      #0969da;
+  --code-bg:     #eff1f3;
+  --quote-bar:   #d0d7de;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+*:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.9375rem;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.doc-title {
+  flex: 1;
+  max-width: 320px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.doc-title:hover  { background: var(--surface-2); }
+.doc-title:focus  { border-color: var(--accent); background: var(--bg); }
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.4rem;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+
+.text-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.4rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.text-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Toolbar ──────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.tool-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.4rem;
+  min-width: 32px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tool-btn:hover { background: var(--surface-2); color: var(--text); }
+
+.tool-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 0.3rem;
+  flex-shrink: 0;
+}
+
+/* ── Workspace ────────────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* lets children scroll instead of growing the page */
+}
+
+/* sidebar */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.new-doc-btn {
+  margin: 0.75rem;
+  padding: 0.6rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.new-doc-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.doc-list { display: flex; flex-direction: column; gap: 0.2rem; padding: 0 0.5rem 0.5rem; }
+
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.65rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.doc-item:hover  { background: var(--surface-2); }
+.doc-item.active { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+
+.doc-item-body { flex: 1; display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+
+.doc-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-item-preview {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-delete {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0;
+  padding: 0.2rem;
+  border-radius: 0.3rem;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.doc-item:hover .doc-delete { opacity: 0.6; }
+.doc-delete:hover { opacity: 1 !important; background: rgba(248,81,73,0.15); }
+
+/* editor pane */
+.editor-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.editor {
+  flex: 1;
+  width: 100%;
+  padding: 1.5rem;
+  border: none;
+  resize: none;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Cascadia Code", "Consolas", ui-monospace, monospace;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  tab-size: 2;
+}
+
+/* divider */
+.divider {
+  width: 5px;
+  flex-shrink: 0;
+  background: var(--border);
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+
+.divider:hover { background: var(--accent); }
+
+/* preview pane */
+.preview-pane {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+}
+
+.preview {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  line-height: 1.65;
+}
+
+/* ── Preview typography ───────────────────────────────────────── */
+.preview h1,
+.preview h2,
+.preview h3,
+.preview h4,
+.preview h5,
+.preview h6 {
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+  font-weight: 700;
+}
+
+.preview h1 { font-size: 1.9rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.preview h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25em; }
+.preview h3 { font-size: 1.25rem; }
+.preview h4 { font-size: 1.05rem; }
+
+.preview h1:first-child,
+.preview h2:first-child,
+.preview h3:first-child { margin-top: 0; }
+
+.preview p { margin: 0.8em 0; }
+
+.preview a { color: var(--accent); text-decoration: none; }
+.preview a:hover { text-decoration: underline; }
+
+.preview ul,
+.preview ol { margin: 0.8em 0; padding-left: 1.6em; }
+.preview li { margin: 0.3em 0; }
+
+.preview blockquote {
+  margin: 1em 0;
+  padding: 0.3em 1em;
+  border-left: 4px solid var(--quote-bar);
+  color: var(--text-dim);
+}
+
+.preview code {
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-family: "Cascadia Code", "Consolas", ui-monospace, monospace;
+  font-size: 0.875em;
+}
+
+.preview pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1em 0;
+  border: 1px solid var(--border);
+}
+
+.preview pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.5; }
+
+.preview hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+.preview img { max-width: 100%; border-radius: 6px; }
+
+.preview del { color: var(--text-muted); }
+
+/* ── Status bar ───────────────────────────────────────────────── */
+.statusbar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.4rem 1rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.saved-indicator {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.saved-indicator.visible { opacity: 1; }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  /* sidebar slides over the content on small screens */
+  .sidebar {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    z-index: 20;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  /* stack editor over preview, hide the drag divider */
+  .workspace    { position: relative; }
+  .editor-pane,
+  .preview-pane { flex: none !important; height: 50%; width: 100%; }
+  .workspace    { flex-direction: column; }
+  .divider      { display: none; }
+  .preview-pane { border-left: none; border-top: 1px solid var(--border); }
+}
+
+@media (min-width: 761px) {
+  /* the toggle is only needed on small screens */
+  #sidebar-toggle { display: none; }
+}
+
+/* ── Help overlay ─────────────────────────────────────────────── */
+.help-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.help-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: min(420px, 90vw);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.help-header h2 { font-size: 1rem; font-weight: 700; }
+
+.shortcut-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.shortcut-table td {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.shortcut-table td:first-child { white-space: nowrap; }
+
+.shortcut-table tr + tr td { border-top: 1px solid var(--border); }
+
+kbd {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+  font-family: "Cascadia Code", monospace;
+}
+
+.help-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}

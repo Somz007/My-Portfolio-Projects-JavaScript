@@ -1,0 +1,11 @@
+{
+  "name": "project-04-expense-tracker",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "vitest": "^1.6.0"
+  }
+}
