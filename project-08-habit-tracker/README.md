@@ -4,6 +4,9 @@ A daily habit tracker with streak counting, a GitHub-style completion heatmap, a
 
 Built as Project 8 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-08-habit-tracker/)**
+
+
 ---
 
 ## Features

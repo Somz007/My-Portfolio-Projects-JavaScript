@@ -4,6 +4,9 @@ Classic Snake built on HTML5 Canvas with a requestAnimationFrame game loop, spee
 
 Built as Project 9 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-09-snake/)**
+
+
 ---
 
 ## Features

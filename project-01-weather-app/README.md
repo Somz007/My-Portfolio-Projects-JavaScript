@@ -4,6 +4,9 @@ A clean, responsive weather app that fetches real-time data from the [OpenWeathe
 
 Built as Project 1 of my JavaScript portfolio while learning frontend web development.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-01-weather-app/) — ⚠️ requires a free [OpenWeather API key](https://openweathermap.org/api) (see setup below)**
+
+
 ---
 
 ## Features

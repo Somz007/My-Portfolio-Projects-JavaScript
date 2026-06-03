@@ -1,0 +1,12 @@
+{
+  "name": "my-portfolio-projects-javascript",
+  "private": true,
+  "scripts": {
+    "predeploy": "node scripts/build.mjs",
+    "deploy": "gh-pages -d dist -b gh-pages",
+    "build": "node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  }
+}

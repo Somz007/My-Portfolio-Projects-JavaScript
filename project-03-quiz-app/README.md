@@ -4,6 +4,9 @@ A fast-paced trivia quiz with live questions pulled from the web, three difficul
 
 Built as Project 3 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-03-quiz-app/)**
+
+
 ---
 
 ## Features

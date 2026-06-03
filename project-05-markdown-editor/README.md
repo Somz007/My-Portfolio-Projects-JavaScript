@@ -4,6 +4,9 @@ A live, split-pane markdown editor with a **from-scratch parser** (no `marked.js
 
 Built as Project 5 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-05-markdown-editor/)**
+
+
 ---
 
 ## Features

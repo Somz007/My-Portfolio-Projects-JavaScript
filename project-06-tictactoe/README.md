@@ -4,6 +4,9 @@ A classic Tic-Tac-Toe game with an **unbeatable AI** powered by the minimax algo
 
 Built as Project 6 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-06-tictactoe/)**
+
+
 ---
 
 ## Features

@@ -4,6 +4,9 @@ A drag-and-drop Kanban board with three columns, inline card editing, and localS
 
 Built as Project 10 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-10-kanban/)**
+
+
 ---
 
 ## Features

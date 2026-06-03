@@ -4,6 +4,9 @@ A clean, keyboard-friendly to-do app with persistence, filtering, and inline edi
 
 Built as Project 2 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-02-todo-list/)**
+
+
 ---
 
 ## Features

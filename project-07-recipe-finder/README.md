@@ -4,6 +4,9 @@ A recipe search and discovery app powered by the free [TheMealDB API](https://ww
 
 Built as Project 7 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-07-recipe-finder/)**
+
+
 ---
 
 ## Features

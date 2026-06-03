@@ -4,6 +4,9 @@ A personal finance dashboard with hand-drawn Canvas charts, budgets, and live mu
 
 Built as Project 4 of my JavaScript portfolio.
 
+🔗 **[Live Demo](https://Somz007.github.io/My-Portfolio-Projects-JavaScript/project-04-expense-tracker/)**
+
+
 ---
 
 ## Features
