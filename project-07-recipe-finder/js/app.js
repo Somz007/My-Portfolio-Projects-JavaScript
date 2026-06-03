@@ -1,4 +1,4 @@
-import { searchByName, getCategories, filterByCategory, lookupById } from './api.js';
+import { searchByName, searchByIngredient, getCategories, filterByCategory, lookupById } from './api.js';
 import { getFavourites, isFavourite, addFavourite, removeFavourite } from './storage.js';
 import {
   renderCategories, renderCards, renderLoading, renderEmpty, renderError,
@@ -79,7 +79,14 @@ async function loadSearch(query) {
   renderLoading();
 
   try {
-    const meals = await searchByName(query);
+    let meals = await searchByName(query);
+
+    // TheMealDB name search covers ~300 meals — fall back to ingredient search
+    // which has much broader coverage and finds things like "pasta", "garlic", etc.
+    if (!meals.length) {
+      meals = await searchByIngredient(query);
+    }
+
     if (!meals.length) { renderEmpty(`No recipes found for "${query}".`); return; }
     setMeals(meals);
   } catch {

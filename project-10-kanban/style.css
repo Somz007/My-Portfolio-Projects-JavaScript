@@ -1,0 +1,323 @@
+/* ── Tokens ───────────────────────────────────────────────────── */
+
+:root[data-theme="dark"] {
+  --bg:          #111827;
+  --surface:     #1f2937;
+  --surface2:    #374151;
+  --text:        #f3f4f6;
+  --text-muted:  #9ca3af;
+  --border:      rgba(255, 255, 255, 0.07);
+  --hover:       rgba(255, 255, 255, 0.05);
+  --shadow:      0 2px 12px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 6px rgba(0, 0, 0, 0.35);
+
+  --todo-accent:   #60a5fa;
+  --prog-accent:   #fbbf24;
+  --done-accent:   #34d399;
+}
+
+:root[data-theme="light"] {
+  --bg:          #f1f5f9;
+  --surface:     #ffffff;
+  --surface2:    #e2e8f0;
+  --text:        #111827;
+  --text-muted:  #6b7280;
+  --border:      rgba(0, 0, 0, 0.07);
+  --hover:       rgba(0, 0, 0, 0.04);
+  --shadow:      0 2px 12px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.1);
+
+  --todo-accent:   #2563eb;
+  --prog-accent:   #d97706;
+  --done-accent:   #059669;
+}
+
+[hidden] { display: none !important; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+*:focus:not(:focus-visible) { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--todo-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── App ──────────────────────────────────────────────────────── */
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  transition: background 0.2s, color 0.2s;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+#theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 50%;
+  width: 2.25rem;
+  height: 2.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+#theme-toggle:hover { background: var(--hover); }
+
+/* ── Board ────────────────────────────────────────────────────── */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+/* ── Column ───────────────────────────────────────────────────── */
+
+.column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 200px;
+  transition: box-shadow 0.15s;
+}
+
+.column.drag-over {
+  box-shadow: 0 0 0 2px var(--todo-accent);
+}
+
+/* per-column accent on the top edge */
+.column[data-col="todo"]        { border-top: 3px solid var(--todo-accent); }
+.column[data-col="in-progress"] { border-top: 3px solid var(--prog-accent); }
+.column[data-col="done"]        { border-top: 3px solid var(--done-accent); }
+
+.column[data-col="in-progress"].drag-over { box-shadow: 0 0 0 2px var(--prog-accent); }
+.column[data-col="done"].drag-over        { box-shadow: 0 0 0 2px var(--done-accent); }
+
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.col-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.col-count {
+  background: var(--surface2);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* ── Cards area ───────────────────────────────────────────────── */
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 40px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: grab;
+  transition: box-shadow 0.15s, transform 0.1s, opacity 0.15s;
+  box-shadow: var(--shadow-card);
+}
+
+.card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.card:active { cursor: grabbing; }
+.card.dragging { opacity: 0.35; transform: rotate(2deg); }
+
+/* done column cards get muted text */
+.column[data-col="done"] .card { opacity: 0.75; }
+.column[data-col="done"] .card-text { text-decoration: line-through; color: var(--text-muted); }
+
+.drag-handle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  flex-shrink: 0;
+  cursor: grab;
+  line-height: 1.4;
+  opacity: 0.5;
+}
+
+.card-text {
+  flex: 1;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.15rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.card:hover .card-actions { opacity: 1; }
+
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 5px;
+  transition: background 0.12s, color 0.12s;
+  line-height: 1;
+}
+
+.edit-btn:hover   { background: var(--hover); color: var(--text); }
+.delete-btn:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+/* ── Drop indicator ───────────────────────────────────────────── */
+
+.drop-line {
+  height: 2px;
+  background: var(--todo-accent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* ── Add card button ──────────────────────────────────────────── */
+
+.add-card-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.83rem;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.add-card-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* ── Inline add form ──────────────────────────────────────────── */
+
+.card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.card-form-input,
+.card-edit-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--todo-accent);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  line-height: 1.45;
+  padding: 0.5rem 0.65rem;
+  resize: none;
+  outline: none;
+}
+
+.card-edit-input {
+  border-color: var(--prog-accent);
+  flex: 1;
+}
+
+.card-form-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.form-add-btn {
+  background: var(--todo-accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.form-add-btn:hover { opacity: 0.85; }
+
+.form-cancel-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.83rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 7px;
+  transition: background 0.15s;
+}
+
+.form-cancel-btn:hover { background: var(--hover); }
+
+/* ── Responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .board { grid-template-columns: 1fr; }
+}

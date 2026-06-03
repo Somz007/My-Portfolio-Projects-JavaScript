@@ -24,6 +24,13 @@ export async function filterByCategory(category) {
   return (data.meals ?? []).slice(0, 24);
 }
 
+// fallback for when name search returns nothing — much broader coverage
+export async function searchByIngredient(ingredient) {
+  const res  = await fetch(`${BASE}/filter.php?i=${encodeURIComponent(ingredient)}`);
+  const data = await res.json();
+  return (data.meals ?? []).slice(0, 24);
+}
+
 // full meal object — cached so repeat modal opens are instant
 export async function lookupById(id) {
   if (lookupCache.has(id)) return lookupCache.get(id);
