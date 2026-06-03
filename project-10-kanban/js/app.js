@@ -8,6 +8,9 @@ let board = loadBoard();
 // ── DOM ────────────────────────────────────────────────────────
 const boardEl   = document.getElementById('board');
 const themeBtn  = document.getElementById('theme-toggle');
+const toast     = document.getElementById('toast');
+const toastMsg  = document.getElementById('toast-msg');
+const toastUndo = document.getElementById('toast-undo');
 const root      = document.documentElement;
 
 // ── Theme ──────────────────────────────────────────────────────
@@ -29,101 +32,176 @@ function renderAll() {
 
 renderAll();
 
-// ── Drag and Drop ───────────────────────────────────────────────
+// ── Undo delete ────────────────────────────────────────────────
 
-let dragging = null; // { cardId, colId }
+let undoTimeout = null;
+let undoBoard   = null; // full board snapshot before the delete
 
-boardEl.addEventListener('dragstart', e => {
+function showUndo(text) {
+  if (undoTimeout) clearTimeout(undoTimeout);
+  const label = text.length > 36 ? text.slice(0, 36) + '…' : text;
+  toastMsg.textContent = `"${label}" deleted`;
+  toast.hidden = false;
+  toast.getBoundingClientRect(); // force reflow so transition fires
+  toast.classList.add('visible');
+  undoTimeout = setTimeout(hideToast, 4000);
+}
+
+function hideToast() {
+  toast.classList.remove('visible');
+  toast.addEventListener('transitionend', () => { toast.hidden = true; }, { once: true });
+  undoBoard = null;
+}
+
+toastUndo.addEventListener('click', () => {
+  if (!undoBoard) return;
+  clearTimeout(undoTimeout);
+  board = undoBoard;
+  saveBoard(board);
+  hideToast();
+  renderAll();
+});
+
+// ── Pointer-events drag (desktop mouse + mobile touch) ─────────
+
+let ptr     = null;  // active drag: { pointerId, cardId, colId, card, startX, startY, offsetX, offsetY, dragging }
+let ghostEl = null;
+
+boardEl.addEventListener('pointerdown', e => {
+  if (e.button !== undefined && e.button !== 0) return;
+  if (e.target.closest('button, textarea, .card-form, .col-empty')) return;
   const card = e.target.closest('.card');
   if (!card) return;
-  dragging = { cardId: card.dataset.id, colId: card.dataset.col };
-  e.dataTransfer.effectAllowed = 'move';
-  // slight delay so the ghost renders before hiding the original
-  requestAnimationFrame(() => card.classList.add('dragging'));
+
+  const rect = card.getBoundingClientRect();
+  ptr = {
+    pointerId: e.pointerId,
+    cardId:    card.dataset.id,
+    colId:     card.dataset.col,
+    card,
+    startX:    e.clientX,
+    startY:    e.clientY,
+    offsetX:   e.clientX - rect.left,
+    offsetY:   e.clientY - rect.top,
+    dragging:  false,
+  };
 });
 
-boardEl.addEventListener('dragend', () => {
-  boardEl.querySelectorAll('.card.dragging').forEach(c => c.classList.remove('dragging'));
-  boardEl.querySelectorAll('.column.drag-over').forEach(c => c.classList.remove('drag-over'));
-  boardEl.querySelectorAll('.drop-line').forEach(el => el.remove());
-  dragging = null;
-});
+document.addEventListener('pointermove', e => {
+  if (!ptr || e.pointerId !== ptr.pointerId) return;
 
-boardEl.addEventListener('dragover', e => {
+  const dist = Math.hypot(e.clientX - ptr.startX, e.clientY - ptr.startY);
+  if (!ptr.dragging && dist < 6) return;
+
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  const col = e.target.closest('.column');
+
+  if (!ptr.dragging) {
+    ptr.dragging = true;
+    ptr.card.classList.add('dragging');
+
+    const rect = ptr.card.getBoundingClientRect();
+    ghostEl = ptr.card.cloneNode(true);
+    ghostEl.className = `card card-ghost`;
+    ghostEl.style.width  = `${rect.width}px`;
+    ghostEl.style.left   = `${e.clientX - ptr.offsetX}px`;
+    ghostEl.style.top    = `${e.clientY - ptr.offsetY}px`;
+    document.body.appendChild(ghostEl);
+  }
+
+  ghostEl.style.left = `${e.clientX - ptr.offsetX}px`;
+  ghostEl.style.top  = `${e.clientY - ptr.offsetY}px`;
+
+  updateDropTarget(e.clientX, e.clientY);
+}, { passive: false });
+
+document.addEventListener('pointerup', e => {
+  if (!ptr || e.pointerId !== ptr.pointerId) return;
+  finishDrag(e.clientX, e.clientY);
+});
+
+document.addEventListener('pointercancel', e => {
+  if (!ptr || e.pointerId !== ptr.pointerId) return;
+  cleanup();
+  ptr = null;
+  renderAll();
+});
+
+function updateDropTarget(clientX, clientY) {
+  boardEl.querySelectorAll('.column').forEach(c => c.classList.remove('drag-over'));
+  boardEl.querySelectorAll('.drop-line').forEach(el => el.remove());
+
+  // ghost has pointer-events:none so elementFromPoint sees through it
+  const under = document.elementFromPoint(clientX, clientY);
+  const col   = under?.closest('.column');
   if (!col) return;
 
-  boardEl.querySelectorAll('.column').forEach(c => c.classList.remove('drag-over'));
   col.classList.add('drag-over');
-
-  // show drop indicator between cards
-  boardEl.querySelectorAll('.drop-line').forEach(el => el.remove());
-  const cardsEl   = col.querySelector('.cards');
-  const visible   = [...cardsEl.querySelectorAll('.card:not(.dragging)')];
-  const afterCard = visible.find(c => {
-    const r = c.getBoundingClientRect();
-    return e.clientY < r.top + r.height / 2;
-  });
+  const cardsEl = col.querySelector('.cards');
+  const visible = [...cardsEl.querySelectorAll('.card:not(.dragging)')];
+  const after   = visible.find(c => clientY < c.getBoundingClientRect().top + c.getBoundingClientRect().height / 2);
 
   const line = document.createElement('div');
   line.className = 'drop-line';
-  if (afterCard) cardsEl.insertBefore(line, afterCard);
+  if (after) cardsEl.insertBefore(line, after);
   else cardsEl.appendChild(line);
-});
+}
 
-boardEl.addEventListener('dragleave', e => {
-  const col = e.target.closest('.column');
-  if (col && !col.contains(e.relatedTarget)) {
-    col.classList.remove('drag-over');
-    col.querySelectorAll('.drop-line').forEach(el => el.remove());
-  }
-});
+function finishDrag(clientX, clientY) {
+  if (!ptr) return;
 
-boardEl.addEventListener('drop', e => {
-  e.preventDefault();
+  const { dragging, colId: fromColId, cardId } = ptr;
+  cleanup();
+  ptr = null;
+
   if (!dragging) return;
 
-  const col = e.target.closest('.column');
-  if (!col) return;
+  const under = document.elementFromPoint(clientX, clientY);
+  const col   = under?.closest('.column');
 
-  const toColId  = col.dataset.col;
-  const cardsEl  = col.querySelector('.cards');
-  const visible  = [...cardsEl.querySelectorAll('.card:not(.dragging)')];
-  const afterCard = visible.find(c => {
-    const r = c.getBoundingClientRect();
-    return e.clientY < r.top + r.height / 2;
-  });
-  const toIndex = afterCard ? visible.indexOf(afterCard) : visible.length;
+  if (col) {
+    const toColId  = col.dataset.col;
+    const cardsEl  = col.querySelector('.cards');
+    // exclude the dragged card from the visible list for correct index calculation
+    const visible  = [...cardsEl.querySelectorAll('.card')].filter(c => c.dataset.id !== cardId);
+    const after    = visible.find(c => clientY < c.getBoundingClientRect().top + c.getBoundingClientRect().height / 2);
+    const toIndex  = after ? visible.indexOf(after) : visible.length;
 
-  board = moveCard(board, dragging.colId, toColId, dragging.cardId, toIndex);
-  saveBoard(board);
+    board = moveCard(board, fromColId, toColId, cardId, toIndex);
+    saveBoard(board);
+  }
+
   renderAll();
-});
+}
+
+function cleanup() {
+  ghostEl?.remove();
+  ghostEl = null;
+  ptr?.card.classList.remove('dragging');
+  boardEl.querySelectorAll('.column').forEach(c => c.classList.remove('drag-over'));
+  boardEl.querySelectorAll('.drop-line').forEach(el => el.remove());
+}
 
 // ── Card and column interaction (delegation) ───────────────────
 
 boardEl.addEventListener('click', e => {
-  // add card button
   const addBtn = e.target.closest('.add-card-btn');
   if (addBtn) { openAddForm(addBtn.dataset.col); return; }
 
-  // delete card
   const delBtn = e.target.closest('.delete-btn');
   if (delBtn) {
-    const card = delBtn.closest('.card');
-    board = deleteCard(board, card.dataset.col, card.dataset.id);
+    const card     = delBtn.closest('.card');
+    const cardText = card.querySelector('.card-text').textContent;
+    undoBoard = board;
+    board     = deleteCard(board, card.dataset.col, card.dataset.id);
     saveBoard(board);
     renderAll();
+    showUndo(cardText);
     return;
   }
 
-  // edit card
   const editBtn = e.target.closest('.edit-btn');
   if (editBtn) {
-    const card = editBtn.closest('.card');
-    openEditForm(card);
+    openEditForm(editBtn.closest('.card'));
     return;
   }
 });
@@ -131,7 +209,6 @@ boardEl.addEventListener('click', e => {
 // ── Add card inline form ───────────────────────────────────────
 
 function openAddForm(colId) {
-  // remove any existing form first
   closeAllForms();
 
   const cardsEl = boardEl.querySelector(`.cards[data-col="${colId}"]`);
@@ -150,21 +227,15 @@ function openAddForm(colId) {
   form.addEventListener('submit', ev => {
     ev.preventDefault();
     const text = form.querySelector('textarea').value.trim();
-    if (text) {
-      board = addCard(board, colId, text);
-      saveBoard(board);
-      renderAll();
-    }
+    if (text) { board = addCard(board, colId, text); saveBoard(board); renderAll(); }
   });
 
   form.querySelector('.form-cancel-btn').addEventListener('click', () => {
-    closeAllForms();
-    renderAll();
+    closeAllForms(); renderAll();
   });
 
   form.addEventListener('keydown', ev => {
     if (ev.key === 'Escape') { closeAllForms(); renderAll(); }
-    // Ctrl+Enter submits without newline
     if (ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) form.dispatchEvent(new Event('submit'));
   });
 }

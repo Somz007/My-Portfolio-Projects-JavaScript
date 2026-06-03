@@ -17,6 +17,7 @@ export function createGame() {
     food:   placeFood(snake, COLS, ROWS),
     ate:    false,
     dead:   false,
+    won:    false,
     ticks:  0,
   };
 }
@@ -50,14 +51,17 @@ export function tick(state, cols = COLS, rows = ROWS) {
   const newSnake = [next, ...snake];
   if (!ateFood) newSnake.pop();
 
+  const won = ateFood && newSnake.length === cols * rows;
+
   return {
     ...state,
     snake:   newSnake,
     dir,
     nextDir: dir,
-    food:    ateFood ? placeFood(newSnake, cols, rows) : food,
+    food:    (ateFood && !won) ? placeFood(newSnake, cols, rows) : food,
     ate:     ateFood,
     dead:    false,
+    won,
     ticks:   state.ticks + 1,
   };
 }

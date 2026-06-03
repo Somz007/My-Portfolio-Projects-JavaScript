@@ -171,14 +171,14 @@ h1 {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  cursor: grab;
+  cursor: default;
+  touch-action: none; /* let pointer events handle drag on mobile */
   transition: box-shadow 0.15s, transform 0.1s, opacity 0.15s;
   box-shadow: var(--shadow-card);
 }
 
 .card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-.card:active { cursor: grabbing; }
-.card.dragging { opacity: 0.35; transform: rotate(2deg); }
+.card.dragging { opacity: 0.2; transform: none; }
 
 /* done column cards get muted text */
 .column[data-col="done"] .card { opacity: 0.75; }
@@ -191,6 +191,7 @@ h1 {
   cursor: grab;
   line-height: 1.4;
   opacity: 0.5;
+  user-select: none;
 }
 
 .card-text {
@@ -208,7 +209,8 @@ h1 {
   transition: opacity 0.15s;
 }
 
-.card:hover .card-actions { opacity: 1; }
+.card:hover .card-actions,
+.card:focus-within .card-actions { opacity: 1; }
 
 .edit-btn,
 .delete-btn {
@@ -230,10 +232,14 @@ h1 {
 
 .drop-line {
   height: 2px;
-  background: var(--todo-accent);
   border-radius: 2px;
   pointer-events: none;
 }
+
+/* each column's drop-line inherits its own accent colour */
+.column[data-col="todo"]        .drop-line { background: var(--todo-accent); }
+.column[data-col="in-progress"] .drop-line { background: var(--prog-accent); }
+.column[data-col="done"]        .drop-line { background: var(--done-accent); }
 
 /* ── Add card button ──────────────────────────────────────────── */
 
@@ -315,6 +321,73 @@ h1 {
 }
 
 .form-cancel-btn:hover { background: var(--hover); }
+
+/* ── Empty column hint ────────────────────────────────────────── */
+
+.col-empty {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1.25rem 0.5rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Undo toast ───────────────────────────────────────────────── */
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(6rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  z-index: 100;
+  white-space: nowrap;
+  font-size: 0.88rem;
+}
+
+.toast.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast-undo {
+  background: var(--todo-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.toast-undo:hover { opacity: 0.85; }
+
+/* ── Ghost card (pointer-events drag) ─────────────────────────── */
+
+.card-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.92;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: none;
+}
 
 /* ── Responsive ───────────────────────────────────────────────── */
 

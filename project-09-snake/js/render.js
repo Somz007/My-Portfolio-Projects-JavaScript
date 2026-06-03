@@ -108,15 +108,27 @@ export function draw(state, highScore, theme) {
     }
   });
 
-  // overlay (start / pause / game over)
+  // overlay (win / game over / start / pause)
   const score = state.snake.length - INIT_LENGTH;
 
-  if (state.dead || state._showStart) {
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+
+  if (state.won) {
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'gold';
+    ctx.font      = `bold ${cs * 0.85}px monospace`;
+    ctx.fillText('YOU WIN! 🏆', W / 2, H / 2 - cs * 1.8);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font      = `${cs * 0.65}px monospace`;
+    ctx.fillText(`Score: ${score}`, W / 2, H / 2 - cs * 0.5);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font      = `${cs * 0.5}px monospace`;
+    ctx.fillText('Enter to play again', W / 2, H / 2 + cs * 1.6);
+  } else if (state.dead || state._showStart) {
     ctx.fillStyle = 'rgba(0,0,0,0.68)';
     ctx.fillRect(0, 0, W, H);
-
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
 
     if (state.dead) {
       ctx.fillStyle = '#f87171';
@@ -127,7 +139,7 @@ export function draw(state, highScore, theme) {
       ctx.font      = `${cs * 0.65}px monospace`;
       ctx.fillText(`Score: ${score}`, W / 2, H / 2 - cs * 0.6);
 
-      if (score >= highScore && score > 0) {
+      if (state._newBest) {
         ctx.fillStyle = 'gold';
         ctx.fillText('New best! 🏆', W / 2, H / 2 + cs * 0.5);
       }
@@ -147,13 +159,11 @@ export function draw(state, highScore, theme) {
     }
   }
 
-  if (state._paused && !state.dead) {
+  if (state._paused && !state.dead && !state.won) {
     ctx.fillStyle    = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle    = '#e2e8f0';
     ctx.font         = `bold ${cs * 0.85}px monospace`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
     ctx.fillText('PAUSED', W / 2, H / 2);
   }
 }

@@ -10,8 +10,7 @@ function esc(str) {
 
 function renderCard(card, colId) {
   return `
-    <div class="card" draggable="true"
-         data-id="${esc(card.id)}" data-col="${esc(colId)}">
+    <div class="card" data-id="${esc(card.id)}" data-col="${esc(colId)}">
       <span class="drag-handle" aria-hidden="true">⠿</span>
       <span class="card-text">${esc(card.text)}</span>
       <div class="card-actions">
@@ -22,6 +21,10 @@ function renderCard(card, colId) {
 }
 
 function renderColumn(col) {
+  const cardsHtml = col.cards.length > 0
+    ? col.cards.map(c => renderCard(c, col.id)).join('')
+    : `<p class="col-empty">Drag cards here or click + Add card</p>`;
+
   return `
     <section class="column" data-col="${esc(col.id)}" aria-label="${esc(col.title)}">
       <div class="col-header">
@@ -29,7 +32,7 @@ function renderColumn(col) {
         <span class="col-count" aria-label="${col.cards.length} cards">${col.cards.length}</span>
       </div>
       <div class="cards" data-col="${esc(col.id)}">
-        ${col.cards.map(c => renderCard(c, col.id)).join('')}
+        ${cardsHtml}
       </div>
       <button class="add-card-btn" data-col="${esc(col.id)}" type="button">
         + Add card
